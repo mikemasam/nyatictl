@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "luxon": "^2.4.0",
+    "ora": "^6.1.0",
+    "ssh2": "^1.11.0",
+    "yaml": "^2.1.1"
+  }
+}
