@@ -6,6 +6,10 @@
   "bin": {
     "nyatictl": "index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikemasam/nyatictl.git"
+  },
   "dependencies": {
     "luxon": "^2.4.0",
     "ora": "^6.1.0",
