@@ -24,7 +24,7 @@ export default class Ssh {
         port: this.server.port || 22,
         username: this.server.username,
         password: this.server.password ? this.server.password : undefined,
-        privateKey: this.server.key ? readFileSync(this.server.key) : undefined 
+        privateKey: this.server.privateKey ? readFileSync(this.server.privateKey) : undefined 
       });
     });
   }
@@ -32,18 +32,19 @@ export default class Ssh {
     this.client?.end();
   }
 
-  async exec(task){
+  async exec(task, argv){
     return new Promise(reslv => {
-      let output = null;
+      let output = '';
       this.client.exec(`${task.dir ? 'cd ' + task.dir + ';' : '' } ${task.cmd}`, (err, stream) => {
         if (err) return reslv([-1 , err?.message]);
         stream.on('close', (code, signal) => {
           reslv([code , output]);
         }).on('data', (data) => {
-          output = data;
+          if(argv.debug) console.log(data.toString());
+          output += data;
         }).stderr.on('data', (data) => {
-          //console.log(data.toString());
-          output = data;
+          if(argv.debug) console.log(data.toString());
+          output += data;
         });
       });
     });

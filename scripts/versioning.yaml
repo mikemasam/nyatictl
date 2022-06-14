@@ -1,0 +1,8 @@
+- name: versions_1
+  cmd: ls ${dir}/releases
+  expect: 0
+  message: "versions1"
+  output:  1
+  desc: get version list found on the server
+  lib: 1
+

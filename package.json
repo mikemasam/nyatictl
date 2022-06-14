@@ -1,5 +1,11 @@
 {
+  "name": "nyatictl",
+  "version": "0.0.1",
   "type": "module",
+  "main":"index.js",
+  "bin": {
+    "nyatictl": "index.js"
+  },
   "dependencies": {
     "luxon": "^2.4.0",
     "ora": "^6.1.0",

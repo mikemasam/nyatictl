@@ -1,16 +1,17 @@
 import { DateTime } from 'luxon';
 const release_version = DateTime.now().toMillis();
-export default function(config){
+export default function(config, tasks){
   const commands = [];
-  for(let i = 0; i < config.tasks.length; i++){
-    const task = config.tasks[i];
+  for(let i = 0; i < tasks.length; i++){
+    const task = tasks[i];
     const command  = {
       name: task.name,
       cmd: task.cmd,
       expect: task.expect,
       message: task.message,
       output: task.output,
-      dir: task.dir
+      dir: task.dir,
+      lib: task.lib
     }
     commands.push(command);
   }
