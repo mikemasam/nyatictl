@@ -7,6 +7,8 @@ export default class Ssh {
     this.name = name;
     this.server = server;
     this.connected = false;
+    this.username = '';
+    this.password = '';
   }
 
   async getInput(label, name, required, hidden){
@@ -15,6 +17,7 @@ export default class Ssh {
       const result = await prompt.get([{ 
         name: "value",
         description: `Enter '${label}' ${name}`,
+        hidden: !!hidden,
         replace: hidden ? "*" : undefined,
         required: true,
         type: "string"
@@ -29,8 +32,8 @@ export default class Ssh {
     }
   }
   async connect(){
-    let username = await this.getInput(this.server.host, "username", true);
-    let password = await this.getInput(this.server.host, "password", true, true);
+    this.username = await this.getInput(this.server.host, "username", true);
+    this.password = await this.getInput(this.server.host, "password", true, true);
     return new Promise(reslv => {
       this.client = new Client();
       this.client.on('ready', () => { 
@@ -45,8 +48,8 @@ export default class Ssh {
         keepaliveInterval: 500,
         host: this.server.host,
         port: this.server.port || 22,
-        username,
-        password,
+        username: this.username,
+        password: this.password,
         privateKey: this.server.privateKey ? readFileSync(this.server.privateKey) : undefined 
       });
     });

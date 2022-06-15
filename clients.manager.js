@@ -5,18 +5,18 @@ export default function(config, argv){
   return {
     clients,
     open: async () => {
-      if(!config.servers) return;
-      const servers = Object.keys(config.servers);
-      if(argv.env == "all"){
-        for(let i = 0; i < servers.length; i++){
-          clients.push(new SshClient(servers[i], config.servers[servers[i]]));
+      if(!config.hosts) return;
+      const hosts = Object.keys(config.hosts);
+      if(argv.exec == "all" || argv.exec === true){
+        for(let i = 0; i < hosts.length; i++){
+          clients.push(new SshClient(hosts[i], config.hosts[hosts[i]]));
         }
-      }else if(config.servers[argv.env]){
-        clients.push(new SshClient(argv.env, config.servers[argv.env]));
+      }else if(config.hosts[argv.exec]){
+        clients.push(new SshClient(argv.exec, config.hosts[argv.exec]));
       }else{
-        console.log(`❌ ERROR: server not found: ${argv.env}`);
+        console.log(`❌ ERROR: server not found: ${argv.exec}`);
       }
-      console.log(`👓 Servers : ${clients.length} servers`);
+      console.log(`👓 Servers : ${clients.length} hosts`);
       for(let i = 0; i < clients.length; i++){
         const client = clients[i];
         const [res, err] = await client.connect();

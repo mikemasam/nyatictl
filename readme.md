@@ -1,7 +1,17 @@
 
-
+# Running tasks
 ```
- - Task definition
+npm i -g nyaticli
+nyaticli --conf nyati.yaml --exec
+options:
+        --exec all                ; all hosts
+        --exec `servername`       ; all hosts
+        --task                    ; run single task
+        --debug                   ; print debug information 
+```
+
+# Task definition
+```
  name: task name no spaces
  cmd: task action
  expect: expected action code
@@ -11,11 +21,14 @@
  lib: available through --task flag
 ```
 
+# Configuration
 ```
 version: 0.1
 appname: 
 dir: '/var/www/html/${appname}/'
-servers:
+params:
+  myparam: this is my paramater value
+hosts:
   live:
     host: localhost
     username: ''
@@ -26,11 +39,20 @@ servers:
     host: '' 
     username: ''
 tasks:
-  - name: ''
-    cmd: '' 
+  - name: create file
+    cmd: touch ~/test.hi
     expect: 0
-  - name: ''
-    cmd: ''
+  - name: write to file
+    cmd: HelloWorld > ~/test.hi
     expect: 0
+  - name: write param to file
+    cmd: ${myparam} > ~/test.hi
+    expect: 0
+    message: This message will be printed when this task is completed with expect code
 ```
 
+# Default paramaters
+```
+appname           ; value from config file
+release_version   ; current unix timestamp in milliseconds
+```

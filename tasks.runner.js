@@ -17,13 +17,15 @@ export default async function(clients, tasks, argv){
 
 
 async function taskRunner(clients, task, clb, argv){
-  const spinner = ora(`🎲 ${task.name}`).start();
   for(let i = 0; i < clients.length; i++){
     const client = clients[i];
+    console.log(`🎐${client.name} ~ ${client.server.host}`);
+    const spinner = ora(`🎲 ${task.name}`).start();
+    if(argv.debug) 
+      console.log(`🎲 ${task.cmd}`);
     const [code, output] = await client.exec(task, argv);
     if(code == task.expect) {
-      spinner.succeed(`🎐${client.name}:[${client.server.host}]: OK`);
-      console.log(`🎲 ${task.name}`);
+      spinner.succeed(`🎲 ${task.name}`);
       if(task.message)
         console.log(`📗${task.message}`);
       if(task.output || argv.debug)

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-const release_version = DateTime.now().toMillis();
+import parseLiteral from './parse.literal.js';
 export default function(config, tasks){
   const commands = [];
   for(let i = 0; i < tasks.length; i++){
@@ -27,21 +27,3 @@ export function parseCommands(config, commands){
   return commands;
 }
 
-export function parseLiteral(config, _literal){
-  if(!_literal) return _literal;
-  let literal = '' + _literal;
-  const params = [...literal.matchAll(/\$\{([a-z_]*)\}/g)];
-  for(let i = 0; i < params.length; i++){
-    const param = params[i];
-    let value = '';
-    if(param[1] == 'appname') value = config.appname;
-    else if(param[1] == 'dir') value = config.dir;
-    else if(param[1] == 'release_version') value = release_version;
-    else {
-      console.log(`❌ERROR: invalid config param ${param[0]}`)
-      process.exit(0);
-    }
-    literal = literal.replaceAll(param[0], value);
-  }
-  return literal;
-}

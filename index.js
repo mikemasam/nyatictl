@@ -10,9 +10,10 @@ import fs from 'fs';
 import path from 'path';
 
 const argv = await getArgv();
-const config = await loadConfig(argv.conf);
+const config = await loadConfig(argv);
 if(!config) printHelp(argv, config);
 if(argv.h) printHelp(argv, config);
+config.release_version = DateTime.now().toMillis();
 
 const commands = [];
 if(config?.tasks?.length){
@@ -21,8 +22,7 @@ if(config?.tasks?.length){
     commands.push(_commands[i]);
   }
 }
-
-await loadScripts();
+if(argv.scripts) await loadScripts();
 if(argv.exec) exec(config, argv);
 
 async function exec(config, argv){
