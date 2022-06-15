@@ -43,10 +43,10 @@ tasks:
     cmd: touch ~/test.hi
     expect: 0
   - name: write to file
-    cmd: HelloWorld > ~/test.hi
+    cmd: echo HelloWorld > ~/test.hi
     expect: 0
   - name: write param to file
-    cmd: ${myparam} > ~/test.hi
+    cmd: echo ${myparam} > ~/test.hi
     expect: 0
     message: This message will be printed when this task is completed with expect code
 ```
