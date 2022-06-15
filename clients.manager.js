@@ -16,7 +16,7 @@ export default function(config, argv){
       }else{
         console.log(`❌ ERROR: server not found: ${argv.env}`);
       }
-      console.log(`✅ Found : ${clients.length} servers`);
+      console.log(`👓 Servers : ${clients.length} servers`);
       for(let i = 0; i < clients.length; i++){
         const client = clients[i];
         const [res, err] = await client.connect();
@@ -25,7 +25,7 @@ export default function(config, argv){
           console.log(`       ${err?.message}`);
           process.exit(1);
         }else{
-          console.log(`✅ Connected: ${client.name}`);
+          console.log(`📡 Found : ${client.name}`);
         }
       }
     },

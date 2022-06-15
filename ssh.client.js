@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import prompt from 'prompt';
 import { Client } from 'ssh2';
 
 export default class Ssh {
@@ -7,7 +8,29 @@ export default class Ssh {
     this.server = server;
     this.connected = false;
   }
+
+  async getInput(label, name, required, hidden){
+    let value = this.server[name];
+    if(value === null || value == '' || (required && value === undefined)){
+      const result = await prompt.get([{ 
+        name: "value",
+        description: `Enter '${label}' ${name}`,
+        replace: hidden ? "*" : undefined,
+        required: true,
+        type: "string"
+      }]).catch(err => false);
+      if(result == false) {
+        console.log("");
+        process.exit(0);
+      }
+      return result.value;
+    }else if(value){
+      return value;
+    }
+  }
   async connect(){
+    let username = await this.getInput(this.server.host, "username", true);
+    let password = await this.getInput(this.server.host, "password", true, true);
     return new Promise(reslv => {
       this.client = new Client();
       this.client.on('ready', () => { 
@@ -22,8 +45,8 @@ export default class Ssh {
         keepaliveInterval: 500,
         host: this.server.host,
         port: this.server.port || 22,
-        username: this.server.username,
-        password: this.server.password ? this.server.password : undefined,
+        username,
+        password,
         privateKey: this.server.privateKey ? readFileSync(this.server.privateKey) : undefined 
       });
     });
