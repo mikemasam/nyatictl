@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const APP_VERSION = 5;
 import getArgv from './parse.argv.js';
 import loadConfig from './parse.config.js';
 import printHelp from './print.help.js';
@@ -13,6 +14,7 @@ const argv = await getArgv();
 const config = await loadConfig(argv);
 if(!config) printHelp(argv, config);
 if(argv.h) printHelp(argv, config);
+checkVersionNumber(config);
 config.release_version = DateTime.now().toMillis();
 
 const commands = [];
@@ -43,6 +45,20 @@ async function loadScripts(){
     for(let i = 0; i < _commands.length; i++){
       commands.push(_commands[i]);
     }
+  }
+}
+
+function checkVersionNumber(config){
+  if(!config.version){
+    console.log("ERROR: Invalid config version number");
+    process.exit(0);
+  }
+  const v = parseInt((config.version + '')?.split('.')?.join(''));
+  if(isNaN(v) || v < APP_VERSION){
+    console.log("ERROR: you are using an version of nyaticli");
+    console.log("\t update with:");
+    console.log("\t npm i -g nyaticli");
+    process.exit(0);
   }
 }
 
