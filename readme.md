@@ -19,6 +19,7 @@ options:
  output: print on success stdout
  dir: working dir
  lib: available through --task flag
+ retry: ask to retry on fail
 ```
 
 # Configuration
@@ -35,6 +36,7 @@ hosts:
     privateKey: ''
     port: ''
     password: ''
+    privateKey: ''
   test:
     host: '' 
     username: ''
@@ -42,6 +44,7 @@ tasks:
   - name: create file
     cmd: touch ~/test.hi
     expect: 0
+    retry: 1
   - name: write to file
     cmd: echo HelloWorld > ~/test.hi
     expect: 0

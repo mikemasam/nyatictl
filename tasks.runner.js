@@ -1,4 +1,5 @@
 import ora from 'ora';
+import prompt from 'prompt';
 
 export default async function(clients, tasks, argv){
   let includeLib = 0;
@@ -19,24 +20,40 @@ export default async function(clients, tasks, argv){
 async function taskRunner(clients, task, clb, argv){
   for(let i = 0; i < clients.length; i++){
     const client = clients[i];
-    console.log(`🎐${client.name} ~ ${client.server.host}`);
-    const spinner = ora(`🎲 ${task.name}`).start();
-    if(argv.debug) 
-      console.log(`🎲 ${task.cmd}`);
-    const [code, output] = await client.exec(task, argv);
-    if(code == task.expect) {
-      spinner.succeed(`🎲 ${task.name}`);
-      if(task.message)
-        console.log(`📗${task.message}`);
-      if(task.output || argv.debug)
-        console.log(`${output}`);
-      if(clb) clb(output);
-    }else{
-      spinner.fail(`❌${client.name}:[${client.server.host}]: Failed`);
-      if(task.error !== 0 || argv.debug)
-        console.log(`\t${output}`);
-      return -1;
+    const result = await taskRunnerClient(client, task, clb, argv);
+    if(result == -1) return result;
+  }
+  return 0;
+}
+
+
+async function taskRunnerClient(client, task, clb, argv){
+  console.log(`🎐${client.name} ~ ${client.server.host}`);
+  const spinner = ora(`🎲 ${task.name}`).start();
+  if(argv.debug) 
+    console.log(`🎲 ${task.cmd}`);
+  const [code, output] = await client.exec(task, argv);
+  if(code == task.expect) {
+    spinner.succeed(`🎲 ${task.name}`);
+    if(task.message)
+      console.log(`📗${task.message}`);
+    if(task.output || argv.debug)
+      console.log(`${output}`);
+    if(clb) clb(output);
+  }else{
+    spinner.fail(`❌${client.name}:[${client.server.host}]: Failed`);
+    if(task.error !== 0 || argv.debug)
+      console.log(`\t${output}`);
+    if(task.retry){
+      const result = await prompt.get([{ 
+        name: "value",
+        description: `Retry '${task.name}' [t/f]`,
+        required: true,
+        type: "boolean"
+      }]).catch(err => ({ value: false }));
+      if(result.value) return taskRunnerClient(client, task, clb, argv);
     }
+    return -1;
   }
   return 0;
 }
