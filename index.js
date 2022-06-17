@@ -55,9 +55,9 @@ function checkVersionNumber(config){
   }
   const v = parseInt((config.version + '')?.split('.')?.join(''));
   if(isNaN(v) || v < APP_VERSION){
-    console.log("ERROR: you are using an version of nyaticli");
+    console.log("ERROR: you are using an version of nyatictl");
     console.log("\t update with:");
-    console.log("\t npm i -g nyaticli");
+    console.log("\t npm i -g nyatictl");
     process.exit(0);
   }
 }

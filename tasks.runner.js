@@ -41,7 +41,7 @@ async function taskRunnerClient(client, task, clb, argv){
       console.log(`${output}`);
     if(clb) clb(output);
   }else{
-    spinner.fail(`❌${client.name}:[${client.server.host}]: Failed`);
+    spinner.fail(`❌${task.name}: Failed`);
     if(task.error !== 0 || argv.debug)
       console.log(`\t${output}`);
     if(task.retry){

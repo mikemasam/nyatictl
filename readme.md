@@ -1,8 +1,8 @@
 
 # Running tasks
 ```
-npm i -g nyaticli
-nyaticli --conf nyati.yaml --exec
+npm i -g nyatictl
+nyatictl --conf nyati.yaml --exec
 options:
         --exec all                ; all hosts
         --exec `servername`       ; all hosts
@@ -24,7 +24,7 @@ options:
 
 # Configuration
 ```
-version: 0.1
+version: 0.0.5      # version lock
 appname: 
 dir: '/var/www/html/${appname}/'
 params:
