@@ -1,6 +1,6 @@
 import ora from 'ora';
 import prompt from 'prompt';
-
+prompt.message = "Nyatictl";
 export default async function(clients, tasks, argv){
   let includeLib = 0;
   if(argv.task){
@@ -32,7 +32,7 @@ async function taskRunnerClient(client, task, clb, argv){
   const spinner = ora(`🎲 ${task.name}`).start();
   if(argv.debug) 
     console.log(`🎲 ${task.cmd}`);
-  const [code, output] = await client.exec(task, argv);
+  const [code, output] = await client.exec(task, argv, spinner);
   if(code == task.expect) {
     spinner.succeed(`🎲 ${task.name}`);
     if(task.message)

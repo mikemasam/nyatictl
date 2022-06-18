@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-const APP_VERSION = 5;
 import getArgv from './parse.argv.js';
 import loadConfig from './parse.config.js';
 import printHelp from './print.help.js';
@@ -9,6 +8,9 @@ import clietsManager from './clients.manager.js';
 import { DateTime } from 'luxon';
 import fs from 'fs';
 import path from 'path';
+
+//only when breaking change has been added
+const APP_VERSION_LOCK = 6;
 
 const argv = await getArgv();
 const config = await loadConfig(argv);
@@ -32,7 +34,7 @@ async function exec(config, argv){
   await man.open();
   const code = await tasksRunner(man.clients, commands, argv);
   await man.close();
-  process.exit(code);
+  return process.exit(code);
 }
 
 async function loadScripts(){
@@ -51,14 +53,18 @@ async function loadScripts(){
 function checkVersionNumber(config){
   if(!config.version){
     console.log("ERROR: Invalid config version number");
-    process.exit(0);
+    return process.exit(0);
   }
   const v = parseInt((config.version + '')?.split('.')?.join(''));
-  if(isNaN(v) || v < APP_VERSION){
+  if(isNaN(v)){
+    console.log("ERROR: Invalid config version number");
+    return process.exit(0);
+  }
+  if(v < APP_VERSION_LOCK){
     console.log("ERROR: you are using an version of nyatictl");
-    console.log("\t update with:");
+    console.log("\t update to lastest version with:");
     console.log("\t npm i -g nyatictl");
-    process.exit(0);
+    return process.exit(0);
   }
 }
 

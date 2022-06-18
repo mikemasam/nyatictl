@@ -12,7 +12,8 @@ export default function(config, tasks){
       output: task.output,
       dir: task.dir,
       lib: task.lib,
-      retry: task.retry
+      retry: task.retry,
+      askpass: task.askpass
     }
     commands.push(command);
   }

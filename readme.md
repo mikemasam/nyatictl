@@ -1,16 +1,16 @@
 
-# Running tasks
+### Running tasks
 ```
 npm i -g nyatictl
 nyatictl --conf nyati.yaml --exec
 options:
         --exec all                ; all hosts
-        --exec `servername`       ; all hosts
+        --exec `servername`       ; single hosts
         --task                    ; run single task
         --debug                   ; print debug information 
 ```
 
-# Task definition
+### Task definition
 ```
  name: task name no spaces
  cmd: task action
@@ -20,11 +20,12 @@ options:
  dir: working dir
  lib: available through --task flag
  retry: ask to retry on fail
+ askpass: password will be asked if required, useful for commands that require sudo
 ```
 
-# Configuration
+### Configuration
 ```
-version: 0.0.5      # version lock
+version: 0.0.7      # version lock
 appname: 
 dir: '/var/www/html/${appname}/'
 params:
@@ -52,9 +53,13 @@ tasks:
     cmd: echo ${myparam} > ~/test.hi
     expect: 0
     message: This message will be printed when this task is completed with expect code
+  - name: test sudo 
+    cmd: echo HelloWorld > /test.hi
+    expect: 0
+    askpass: 1
 ```
 
-# Default paramaters
+### Default paramaters
 ```
 appname           ; value from config file
 release_version   ; current unix timestamp in milliseconds
