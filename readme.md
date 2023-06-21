@@ -47,8 +47,9 @@ hosts:
     username: ''
     privateKey: ''
     port: ''
-    password: '#env:THIS_IS_ENV_KEY'   //this value will be loaded from .env on  the current directory
+    password: '#env:THIS_IS_ENV_KEY'   //this value will be loaded from .env on  the current directory (#env:)
     privateKey: '/home/<username>/.ssh/id_rsa' //this can also be configured on .env file
+    passphrase: '#env?:THIS_IS_ENV_KEY'   //optional enviroment value, no error when not found (#env?:)
   test:
     host: '' 
     username: ''
