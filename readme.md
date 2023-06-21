@@ -1,11 +1,18 @@
 
-### Running tasks
+### Installation
 ```
 npm i -g nyatictl
+```
+### Running tasks
+```
 - without specifying configuration file
 nyatictl hostname
+
 - specifying configuration file
 nyatictl --conf nyati.yaml hostname
+```
+### Options 
+```
 options:
         nyatictl hostname         ; single host
         nyatictl --exec all       ; all hosts
