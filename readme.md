@@ -2,10 +2,14 @@
 ### Running tasks
 ```
 npm i -g nyatictl
-nyatictl --conf nyati.yaml --exec
+- without specifying configuration file
+nyatictl hostname
+- specifying configuration file
+nyatictl --conf nyati.yaml hostname
 options:
-        --exec all                ; all hosts
-        --exec `servername`       ; single hosts
+        nyatictl hostname         ; single host
+        nyatictl --exec all       ; all hosts
+        nyatictl --exec hostname  ; single host
         --task                    ; run single task
         --debug                   ; print debug information 
 ```
@@ -25,7 +29,7 @@ options:
 
 ### Configuration
 ```
-version: 0.0.7      # version lock
+version: 0.0.8      # version lock
 appname: 
 dir: '/var/www/html/${appname}/'
 params:
@@ -36,8 +40,8 @@ hosts:
     username: ''
     privateKey: ''
     port: ''
-    password: ''
-    privateKey: ''
+    password: '#env:THIS_IS_ENV_KEY'   //this value will be loaded from .env on  the current directory
+    privateKey: '/home/<username>/.ssh/id_rsa' //this can also be configured on .env file
   test:
     host: '' 
     username: ''
