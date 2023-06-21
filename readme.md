@@ -6,17 +6,17 @@ npm i -g nyatictl
 ### Running tasks
 ```
 - without specifying configuration file
-nyatictl hostname
+nyatictl <host>
 
 - specifying configuration file
-nyatictl --conf nyati.yaml hostname
+nyatictl --conf nyati.yaml <host>
 ```
 ### Options 
 ```
 options:
-        nyatictl hostname         ; single host
+        nyatictl <host>         ; single host
         nyatictl --exec all       ; all hosts
-        nyatictl --exec hostname  ; single host
+        nyatictl --exec <host>  ; single host
         --task                    ; run single task
         --debug                   ; print debug information 
 ```
