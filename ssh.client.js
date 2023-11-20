@@ -74,7 +74,8 @@ export default class Ssh {
         reslv([false, err]);
       });
       const con_opts = {
-        keepaliveInterval: 500,
+        keepaliveInterval: 1000,
+        keepaliveCountMax: 30,
         host: this.server.host,
         port: this.server.port || 22,
         username: this.server.username,
@@ -104,7 +105,7 @@ export default class Ssh {
               if (output_log)
                 console.log(
                   `auth required = [${authRequired}] `,
-                  data.toString()
+                  data.toString(),
                 );
               output += data.toString();
               if (
@@ -126,7 +127,7 @@ export default class Ssh {
               if (output_log) console.log(data.toString());
               output += data;
             });
-        }
+        },
       );
     });
   }

@@ -10,7 +10,7 @@ import fs from "fs";
 import path from "path";
 
 //only when breaking change has been added
-const APP_VERSION_LOCK = 8;
+const APP_VERSION_LOCK = 11;
 
 const argv = await getArgv();
 const config = await loadConfig(argv);
