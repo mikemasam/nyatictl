@@ -1,9 +1,11 @@
-
 ### Installation
+
 ```
 npm i -g nyatictl
 ```
+
 ### Running tasks
+
 ```
 - without specifying configuration file
 nyatictl <host>
@@ -11,17 +13,20 @@ nyatictl <host>
 - specifying configuration file
 nyatictl --conf nyati.yaml <host>
 ```
-### Options 
+
+### Options
+
 ```
 options:
-        nyatictl <host>         ; single host
-        nyatictl --exec all       ; all hosts
-        nyatictl --exec <host>  ; single host
+        nyatictl <host>  ; single host
+        nyatictl all     ; all hosts
+        nyatictl <host>  ; single host
         --task                    ; run single task
-        --debug                   ; print debug information 
+        --debug                   ; print debug information
 ```
 
 ### Task definition
+
 ```
  name: task name no spaces
  cmd: task action
@@ -35,9 +40,10 @@ options:
 ```
 
 ### Configuration
+
 ```
-version: 0.0.8      # version lock
-appname: 
+version: 0.1.3      # version lock
+appname:
 dir: '/var/www/html/${appname}/'
 params:
   myparam: this is my paramater value
@@ -51,7 +57,7 @@ hosts:
     privateKey: '/home/<username>/.ssh/id_rsa' //this can also be configured on .env file
     passphrase: '#env?:THIS_IS_ENV_KEY'   //optional enviroment value, no error when not found (#env?:)
   test:
-    host: '' 
+    host: ''
     username: ''
 tasks:
   - name: create file
@@ -65,13 +71,14 @@ tasks:
     cmd: echo ${myparam} > ~/test.hi
     expect: 0
     message: This message will be printed when this task is completed with expect code
-  - name: test sudo 
+  - name: test sudo
     cmd: echo HelloWorld > /test.hi
     expect: 0
     askpass: 1
 ```
 
 ### Default paramaters
+
 ```
 appname           ; value from config file
 release_version   ; current unix timestamp in milliseconds
