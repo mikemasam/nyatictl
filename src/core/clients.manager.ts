@@ -11,7 +11,7 @@ import type {
   Server,
 } from "../types.js";
 
-export default function (config: Config): ClientsManager {
+export default function clientsManager(config: Config): ClientsManager {
   const clients: SshClient[] = [];
 
   const add_client = async (
