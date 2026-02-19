@@ -1,12 +1,12 @@
 import { logger } from "../lib/logger.js";
-import type { Config, Task, Command, SshClient } from "../types.js";
+import type { Config, Task, SshClient } from "../types.js";
 
 export default function parseTaskTemplate(
   config: Config,
   client: SshClient,
   task: Task,
-): Command {
-  const command: Command = {
+): Task {
+  const command: Task = {
     name: task.name,
     cmd: task.cmd,
     expect: task.expect,

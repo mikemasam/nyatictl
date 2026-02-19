@@ -9,6 +9,7 @@ export interface Task {
   retry?: number;
   askpass?: number;
   error?: number;
+  hosts?: string[];
 }
 
 export interface Server {
@@ -46,8 +47,6 @@ export interface Argv {
   [key: string]: string | boolean | undefined;
 }
 
-export interface Command extends Task {}
-
 export interface ClientsManager {
   clients: SshClient[];
   open: () => Promise<void>;
@@ -65,6 +64,6 @@ export interface SshClient {
   exec: (
     task: Task,
     spinner: unknown,
-    config: Config 
+    config: Config,
   ) => Promise<[number, string]>;
 }

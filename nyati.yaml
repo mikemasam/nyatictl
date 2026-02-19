@@ -82,6 +82,7 @@ tasks:
   - name: print_host
     cmd: echo "On Host ${host}"
     expect: 0
+    hosts: ["live", "local"]
   - name: version_info
     cmd: "echo App: ${appname}, Dir: ${dir}, Version: ${release_version}"
     expect: 0

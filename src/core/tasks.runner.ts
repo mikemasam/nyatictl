@@ -13,7 +13,7 @@ export default async function tasksRunner(
 ): Promise<number> {
   if (config.argv.debug) {
     logger.setLevel(0);
-    logger.setTimestamps(true);
+    //logger.setTimestamps(true);
   }
 
   let includeLib = 0;
@@ -42,6 +42,12 @@ async function taskRunner(
 ): Promise<number> {
   for (let i = 0; i < clients.length; i++) {
     const client = clients[i];
+    if (task.hosts !== undefined) {
+      if (!task.hosts.includes(client.name)) {
+        logger.warn(`Task :${task.name} skipped for host :${client.name}`);
+        continue;
+      }
+    }
     const result = await taskRunnerClient(client, task, _clb, config);
     if (result === -1) return result;
   }
@@ -63,12 +69,18 @@ async function taskRunnerClient(
     spinner.stop();
     logger.taskSuccess(client, task.name, code, task.message);
     if (client.server.output || task.output || debugging)
-      logger.debug(`Output:\n${output}`);
+      logger.debug(
+        `----------------Start Output---------------\n${output}\n-------------End Output--------------`,
+      );
     if (_clb) _clb(output);
   } else {
     spinner.stop();
     logger.taskFail(client, task.name, code, output);
-    if (debugging) logger.debug(`Error output:\n${output}`);
+    if (debugging) {
+      logger.debug(
+        `----------------Start Error Output---------------\n${output}\n-------------End Error Output--------------`,
+      );
+    }
     if (task.retry) {
       const result = await prompt
         .get([

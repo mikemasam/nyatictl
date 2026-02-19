@@ -64,7 +64,7 @@ export default function (config: Config): ClientsManager {
           );
           process.exit(1);
         } else {
-          logger.info(`Connected to ${client.name}:${client.server.host}`);
+          logger.success(`Connected to ${client.name}:${client.server.host}`);
         }
       }
     },
