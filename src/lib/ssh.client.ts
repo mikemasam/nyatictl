@@ -8,6 +8,7 @@ import type {
   SshClient as SshClientType,
   Config,
 } from "../types.js";
+import { parseLiteralString } from "../parsers/parse.tasks.js";
 
 interface SshClientInput {
   name: string;
@@ -28,7 +29,6 @@ export default class Ssh implements SshClientType {
 
   constructor(config: Config, name: string, server: Server) {
     this.config = config;
-    this.name = name;
     this.name = name;
     this.server = server;
     this.connected = false;
@@ -123,51 +123,52 @@ export default class Ssh implements SshClientType {
     task: Task,
     _spinner: unknown,
     config: Config,
-  ): Promise<[number, string]> {
+  ): Promise<[number, string, string]> {
     return new Promise((resolve) => {
       let output = "";
-      if (config.argv.debug) logger.debug(`Command: ${task.cmd}`);
-      const authRequired = task.askpass === 1;
-      this.client?.exec(
-        `${task.dir ? "cd " + task.dir + ";" : ""} ${task.cmd}`,
-        { pty: true },
-        (err, stream) => {
-          if (err) {
-            return resolve([-1, err?.message || ""]);
-          }
-          stream.on("close", (code: number) => {
-            resolve([code, output]);
-          });
-          stream.on("data", (data: Buffer) => {
-            if (config.argv.debug) {
-              const dataStr = data.toString();
-              if (authRequired && dataStr.toLowerCase().includes("password")) {
-                logger.debug("Password prompt detected");
-              } else {
-                logger.debug(dataStr);
-              }
-            }
-            output += data.toString();
-            if (
-              authRequired &&
-              output.slice(-2, -1) === ":" &&
-              output.indexOf("assword") > -1
-            ) {
-              (_spinner as { stop: () => void; start: () => void })?.stop();
-              this.getSUPassword().then(() => {
-                (_spinner as { stop: () => void; start: () => void })?.start();
-                output = "";
-                if (config.argv.debug) logger.debug("Password submitted");
-                stream.write(`${this.password}\n`);
-              });
-            }
-          });
-          stream.stderr.on("data", (data: Buffer) => {
-            if (config.argv.debug) logger.debug(data.toString());
-            output += data.toString();
-          });
-        },
+      const dir = parseLiteralString(
+        config,
+        this,
+        task.dir ?? config.dir ?? "",
       );
+      const cmd = `${dir ? "cd " + dir + " && " : ""} ${task.cmd}`;
+      const authRequired = task.askpass === 1;
+      this.client?.exec(cmd, { pty: true }, (err, stream) => {
+        if (err) {
+          return resolve([-1, err?.message || "", cmd]);
+        }
+        stream.on("close", (code: number) => {
+          resolve([code, output, cmd]);
+        });
+        stream.on("data", (data: Buffer) => {
+          if (config.argv.debug) {
+            const dataStr = data.toString();
+            if (authRequired && dataStr.toLowerCase().includes("password")) {
+              logger.debug("Password prompt detected");
+            } else {
+              logger.debug(dataStr);
+            }
+          }
+          output += data.toString();
+          if (
+            authRequired &&
+            output.slice(-2, -1) === ":" &&
+            output.indexOf("assword") > -1
+          ) {
+            (_spinner as { stop: () => void; start: () => void })?.stop();
+            this.getSUPassword().then(() => {
+              (_spinner as { stop: () => void; start: () => void })?.start();
+              output = "";
+              if (config.argv.debug) logger.debug("Password submitted");
+              stream.write(`${this.password}\n`);
+            });
+          }
+        });
+        stream.stderr.on("data", (data: Buffer) => {
+          if (config.argv.debug) logger.debug(data.toString());
+          output += data.toString();
+        });
+      });
     });
   }
 

@@ -59,27 +59,23 @@ async function taskRunnerClient(
   config: Config,
 ): Promise<number> {
   const task = parseTaskTemplate(config, client, _task);
-  //logger.serverConnect(client.name, client.server.host);
-  const debugging = config.argv.debug;
-
   const spinner = ora(`Running: ${task.name}`).start();
-  const [code, output] = await client.exec(task, spinner, config);
-
+  const [code, output, cmd] = await client.exec(task, spinner, config);
   if (code === task.expect) {
     spinner.stop();
     logger.taskSuccess(client, task.name, code, task.message);
-    if (client.server.output || task.output || debugging)
+    if (task.output || config.argv.debug)
       logger.debug(
         `----------------Start Output---------------\n${output}\n-------------End Output--------------`,
       );
-    if (task.output || config.argv.debug || config.argv.console) {
-      logger.consoleOutput(task.cmd, output);
+    if (task.output || config.argv.debug) {
+      logger.consoleOutput(cmd, output);
     }
   } else {
     spinner.stop();
-    logger.consoleOutput(task.cmd, output);
-    logger.taskFail(client, task.name, code, output);
-    if (debugging) {
+    logger.taskFail(client, task.name, code, task.message);
+    logger.consoleOutput(cmd, output);
+    if (config.argv.debug) {
       logger.debug(
         `----------------Start Error Output---------------\n${output}\n-------------End Error Output--------------`,
       );

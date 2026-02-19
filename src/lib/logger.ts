@@ -27,47 +27,37 @@ class Logger {
     this.color = enabled;
   }
 
-  private format(level: string, message: string): string {
-    const timestamp = this.timestamps
-      ? `${DateTime.now().toFormat("HH:mm:ss")} `
-      : "";
-    const prefix = this.color ? level : level.replace(/\[\d+m/g, "");
-    return `${timestamp}${prefix}${message}`;
+  private writeln(level: string, message: string, ...args: any[]) {
+    console.log(`${level} ${message}`, ...args);
   }
 
-  debug(message: string, ...args: unknown[]): void {
+  debug(message: string, ...args: any[]): void {
     if (this.level > LogLevel.DEBUG) return;
-    const msg = this.format(chalk.gray("💡"), message);
-    console.log(msg, ...args);
+    this.writeln(chalk.gray("💡"), message, ...args);
   }
 
-  info(message: string, ...args: unknown[]): void {
+  info(message: string, ...args: any[]): void {
     if (this.level > LogLevel.INFO) return;
-    const msg = this.format(chalk.blue("!"), " " + message);
-    console.log(msg, ...args);
+    this.writeln(chalk.blue("!"), chalk.blue(message), ...args);
   }
 
-  success(message: string, ...args: unknown[]): void {
+  success(message: string, ...args: any[]): void {
     if (this.level > LogLevel.SUCCESS) return;
-    const msg = this.format(chalk.green("✔"), " " + message);
-    console.log(msg, ...args);
+    this.writeln(chalk.green("✔"), chalk.green(message), ...args);
   }
 
   warn(message: string, ...args: unknown[]): void {
     if (this.level > LogLevel.WARN) return;
-    const msg = this.format(chalk.yellow("⚠️"), " " + message);
-    console.warn(msg, ...args);
+    this.writeln("⚠️", chalk.yellow(message), ...args);
   }
 
   error(message: string, ...args: unknown[]): void {
     if (this.level > LogLevel.ERROR) return;
-    const msg = this.format(chalk.red("✗"), " " + message);
-    console.error(msg, ...args);
+    this.writeln(chalk.red("✗"), chalk.red(message), ...args);
   }
 
-  consoleOutput(command: string | null, output: string): void {
-    const cmd = this.format(chalk.cyan("$ "), `${command}`);
-    console.log(cmd + "\n" + output);
+  consoleOutput(command: string, output: string): void {
+    this.writeln(chalk.blue("$ "), command, "\n" + output);
   }
 
   taskSuccess(
@@ -78,11 +68,11 @@ class Logger {
   ): void {
     if (this.level > LogLevel.SUCCESS) return;
     const codeMsg = chalk.gray(`code: ${code} -`);
-    const msg = this.format(
+    this.writeln(
       chalk.green(`✔ [${client.name}:${client.server.host}]`),
-      ` ${codeMsg} ${taskName}: ${message ?? "..."}`,
+      ` ${codeMsg} ${taskName}:`,
+      chalk.gray(message ?? "..."),
     );
-    console.log(msg);
   }
 
   taskFail(
@@ -92,27 +82,11 @@ class Logger {
     message?: string,
   ): void {
     const codeMsg = chalk.gray(`code: ${code} -`);
-    const msg = this.format(
+    this.writeln(
       chalk.red(`✗ [${client.name}:${client.server.host}]`),
-      ` ${codeMsg} ${taskName}: ${message}`,
+      ` ${codeMsg} ${taskName}:`,
+      chalk.gray(message ?? "..."),
     );
-    console.error(msg);
-  }
-
-  serverConnect(name: string, host: string): void {
-    if (this.level > LogLevel.INFO) return;
-    const msg = this.format(chalk.magenta("🖥"), ` ${name}@${host}`);
-    console.log(msg);
-  }
-
-  serverError(name: string, message: string): void {
-    const msg = this.format(chalk.red("🖥✗"), ` ${name}: ${message}`);
-    console.error(msg);
-  }
-
-  configError(message: string): void {
-    const msg = this.format(chalk.red("⚙✗"), " " + message);
-    console.error(msg);
   }
 
   help(lines: string[]): void {

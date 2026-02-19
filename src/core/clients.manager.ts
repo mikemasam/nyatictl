@@ -21,7 +21,7 @@ export default function clientsManager(config: Config): ClientsManager {
     const client = new SshClient(config, host, config_host);
     const [env, msg] = await loadEnv(config_host);
     if (!env) {
-      logger.serverError(client.name, `${client.server.host} - ${msg}`);
+      logger.error(`${client.name}:${client.server.host} - ${msg}`);
       process.exit(0);
     }
     client.loadEnv(env);
@@ -58,10 +58,12 @@ export default function clientsManager(config: Config): ClientsManager {
         const client = clients[i];
         const [res, err] = await client.connect();
         if (!res) {
-          logger.serverError(
-            client.name,
-            `${(err as { message?: string })?.message}`,
+          logger.error(
+            `${client.name}: ${(err as { message?: string })?.message}`,
           );
+          if (config.argv.debug) {
+            console.log(err);
+          }
           process.exit(1);
         } else {
           logger.success(`Connected to ${client.name}:${client.server.host}`);

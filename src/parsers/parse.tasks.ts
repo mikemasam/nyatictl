@@ -17,13 +17,13 @@ export default function parseTaskTemplate(
     retry: task.retry,
     askpass: task.askpass,
   };
-  command.cmd = parseLiteral(config, client, command.cmd) || "";
-  command.dir = parseLiteral(config, client, command.dir);
-  command.message = parseLiteral(config, client, command.message);
+  command.cmd = parseLiteralString(config, client, command.cmd) || "";
+  command.dir = parseLiteralString(config, client, command.dir);
+  command.message = parseLiteralString(config, client, command.message);
   return command;
 }
 
-function parseLiteral(
+export function parseLiteralString(
   config: Config,
   client: SshClient,
   _literal: string | undefined,
@@ -35,16 +35,17 @@ function parseLiteral(
   for (let i = 0; i < params.length; i++) {
     const param = params[i];
     let value: any = "";
-    if (param[1] === "appname") value = config.appname;
-    else if (param[1] === "dir")
-      value = parseLiteral(config, client, config.dir);
-    else if (param[1] === "host") value = client.name;
-    else if (param[1] === "release_version")
+    if (param[1] === "appname") {
+      value = config.appname;
+    } else if (param[1] === "dir") {
+      value = parseLiteralString(config, client, config.dir);
+    } else if (param[1] === "host") value = client.name;
+    else if (param[1] === "release_version") {
       value = String(config.release_version);
-    else if (configParamKeys.indexOf(param[1]) > -1) {
+    } else if (configParamKeys.indexOf(param[1]) > -1) {
       value = config.params?.[param[1]] || "";
     } else {
-      logger.configError(`Invalid config param: ${param[0]}`);
+      logger.error(`Invalid config param: ${param[0]}`);
       process.exit(0);
     }
     literal = literal.replaceAll(param[0], value);

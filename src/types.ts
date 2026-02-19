@@ -21,7 +21,6 @@ export interface Server {
   passphrase?: string;
   envpath?: string;
   envfile?: string;
-  output?: boolean;
 }
 
 export interface Config {
@@ -65,5 +64,5 @@ export interface SshClient {
     task: Task,
     spinner: unknown,
     config: Config,
-  ) => Promise<[number, string]>;
+  ) => Promise<[number, string, string]>;
 }

@@ -1,6 +1,6 @@
 version: 1.0
 appname: myapp
-dir: "/var/www/html/${appname}/"
+dir: "/tmp"
 params:
   myparam: this is my parameter value
   another_param: another value

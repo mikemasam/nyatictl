@@ -9,7 +9,7 @@ export default async function loadConfig(argv: Argv): Promise<Config | null> {
   return new Promise((relv) => {
     fs.stat(cfile, function (err) {
       if (err) {
-        logger.configError(`Config file not found: ${argv.conf}`);
+        logger.error(`Config file not found: ${argv.conf}`);
         return relv(null);
       }
       const file = fs.readFileSync(cfile, "utf8");
@@ -17,23 +17,23 @@ export default async function loadConfig(argv: Argv): Promise<Config | null> {
       try {
         config = YAML.parse(file, {});
       } catch (e) {
-        logger.configError(`Failed to parse ${argv.conf}: ${e}`);
+        logger.error(`Failed to parse ${argv.conf}: ${e}`);
         return relv(null);
       }
       if (!config) {
-        logger.configError(`Config is empty: ${argv.conf}`);
+        logger.error(`Config is empty: ${argv.conf}`);
         return relv(null);
       }
       if (!config.appname) {
-        logger.configError(`config.appname not defined in ${argv.conf}`);
+        logger.error(`config.appname not defined in ${argv.conf}`);
         return relv(null);
       }
       if (!Object.keys(config.hosts || {}).length) {
-        logger.configError(`config.hosts not defined or empty in ${argv.conf}`);
+        logger.error(`config.hosts not defined or empty in ${argv.conf}`);
         return relv(null);
       }
       if (!config.tasks?.length) {
-        logger.configError(`config.tasks not defined or empty in ${argv.conf}`);
+        logger.error(`config.tasks not defined or empty in ${argv.conf}`);
         return relv(null);
       }
       config.argv = argv;
