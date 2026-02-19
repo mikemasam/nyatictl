@@ -9,7 +9,7 @@ export default function parseTaskTemplate(
   const command: Task = {
     name: task.name,
     cmd: task.cmd,
-    expect: task.expect,
+    expect: task.expect === undefined ? 0 : task.expect,
     message: task.message,
     output: task.output,
     dir: task.dir,

@@ -1,6 +1,6 @@
 {
   "name": "nyatictl",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "description": "A remote server automation and deployment tool written in nodejs/npm, inspired by capistrano.",
   "main": "dist/core/index.js",

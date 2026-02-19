@@ -2,7 +2,6 @@
 import getArgv from "./parsers/parse.argv.js";
 import loadConfig from "./parsers/parse.config.js";
 import printHelp from "./print.help.js";
-import parseTasks from "./parsers/parse.tasks.js";
 import tasksRunner from "./core/tasks.runner.js";
 import clietsManager from "./core/clients.manager.js";
 import { logger } from "./lib/logger.js";
