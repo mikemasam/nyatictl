@@ -28,7 +28,7 @@ export default async function tasksRunner(
   for (let t = 0; t < tasks.length; t++) {
     const task = tasks[t];
     if (task.lib && !includeLib) continue;
-    const res = await taskRunner(clients, task, null, config);
+    const res = await taskRunner(clients, task, config);
     if (res === -1) return -1;
   }
   return 0;
@@ -37,7 +37,6 @@ export default async function tasksRunner(
 async function taskRunner(
   clients: SshClient[],
   task: Task,
-  _clb: ((output: string) => void) | null,
   config: Config,
 ): Promise<number> {
   for (let i = 0; i < clients.length; i++) {
@@ -48,7 +47,7 @@ async function taskRunner(
         continue;
       }
     }
-    const result = await taskRunnerClient(client, task, _clb, config);
+    const result = await taskRunnerClient(client, task, config);
     if (result === -1) return result;
   }
   return 0;
@@ -57,14 +56,15 @@ async function taskRunner(
 async function taskRunnerClient(
   client: SshClient,
   _task: Task,
-  _clb: ((output: string) => void) | null,
   config: Config,
 ): Promise<number> {
   const task = parseTaskTemplate(config, client, _task);
   //logger.serverConnect(client.name, client.server.host);
-  const spinner = ora(`Running: ${task.name}`).start();
   const debugging = config.argv.debug;
+
+  const spinner = ora(`Running: ${task.name}`).start();
   const [code, output] = await client.exec(task, spinner, config);
+
   if (code === task.expect) {
     spinner.stop();
     logger.taskSuccess(client, task.name, code, task.message);
@@ -72,9 +72,12 @@ async function taskRunnerClient(
       logger.debug(
         `----------------Start Output---------------\n${output}\n-------------End Output--------------`,
       );
-    if (_clb) _clb(output);
+    if (task.output || config.argv.debug || config.argv.console) {
+      logger.consoleOutput(task.cmd, output);
+    }
   } else {
     spinner.stop();
+    logger.consoleOutput(task.cmd, output);
     logger.taskFail(client, task.name, code, output);
     if (debugging) {
       logger.debug(
@@ -92,8 +95,7 @@ async function taskRunnerClient(
           },
         ])
         .catch(() => ({ value: false }));
-      if (result.value == "y")
-        return taskRunnerClient(client, task, _clb, config);
+      if (result.value == "y") return taskRunnerClient(client, task, config);
     }
     return -1;
   }

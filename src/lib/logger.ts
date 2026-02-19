@@ -65,10 +65,9 @@ class Logger {
     console.error(msg, ...args);
   }
 
-  taskStart(taskName: string): void {
-    if (this.level > LogLevel.INFO) return;
-    const msg = this.format(chalk.cyan("▶"), " " + taskName);
-    console.log(msg);
+  consoleOutput(command: string | null, output: string): void {
+    const cmd = this.format(chalk.cyan("$ "), `${command}`);
+    console.log(cmd + "\n" + output);
   }
 
   taskSuccess(
