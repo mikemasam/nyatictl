@@ -4,6 +4,7 @@ import type { Argv } from "../types.js";
 
 export default async function getArgs(): Promise<Argv> {
   const args = await yargs(hideBin(process.argv))
+    .scriptName("nyatictl")
     .option("conf", {
       alias: "c",
       type: "string",
@@ -38,6 +39,7 @@ export default async function getArgs(): Promise<Argv> {
       description: "Load scripts from ./scripts directory",
       default: false,
     })
+    .exitProcess(false)
     .parseAsync();
 
   const result: Argv = {

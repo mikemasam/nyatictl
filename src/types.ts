@@ -8,7 +8,6 @@ export interface Task {
   lib?: number;
   retry?: number;
   askpass?: number;
-  debug?: boolean;
   error?: number;
 }
 
@@ -21,7 +20,6 @@ export interface Server {
   passphrase?: string;
   envpath?: string;
   envfile?: string;
-  debug?: boolean;
   output?: boolean;
 }
 
@@ -32,6 +30,7 @@ export interface Config {
   params?: Record<string, string>;
   hosts: Record<string, Server>;
   tasks: Task[];
+  argv: Argv;
   release_version?: number;
 }
 
@@ -43,6 +42,7 @@ export interface Argv {
   task?: string;
   exec?: string | boolean;
   scripts?: boolean;
+  all?: boolean;
   [key: string]: string | boolean | undefined;
 }
 
@@ -65,6 +65,6 @@ export interface SshClient {
   exec: (
     task: Task,
     spinner: unknown,
-    output_log: boolean
+    config: Config 
   ) => Promise<[number, string]>;
 }

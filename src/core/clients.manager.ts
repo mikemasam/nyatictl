@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { readFileSync, existsSync } from "fs";
 import SshClient from "../lib/ssh.client.js";
+import { logger } from "../lib/logger.js";
 import type {
   Config,
   Argv,
@@ -10,20 +11,17 @@ import type {
   Server,
 } from "../types.js";
 
-export default function (config: Config, argv: Argv): ClientsManager {
+export default function (config: Config): ClientsManager {
   const clients: SshClient[] = [];
 
   const add_client = async (
     host: string,
     config_host: Server,
   ): Promise<SshClient> => {
-    const client = new SshClient(host, config_host);
+    const client = new SshClient(config, host, config_host);
     const [env, msg] = await loadEnv(config_host);
     if (!env) {
-      console.log(
-        `❌ ERROR: connection failed ${client.name} - ${client.server.host}`,
-      );
-      console.log(`       ${msg}`);
+      logger.serverError(client.name, `${client.server.host} - ${msg}`);
       process.exit(0);
     }
     client.loadEnv(env);
@@ -35,14 +33,16 @@ export default function (config: Config, argv: Argv): ClientsManager {
     open: async (): Promise<void> => {
       if (!config.hosts) return;
       const hosts = Object.keys(config.hosts);
-      if (argv.exec && argv.exec === true) {
-        console.log(
-          `💀 --exec has changed to support -> \n\t'nyatictl --exec hostname' \n\t'nyatictl hostname' \n\t'nyatictl --exec all'`,
-        );
+      if (config.argv.exec && config.argv.exec === true) {
+        logger.warn("--exec syntax changed. Use:");
+        logger.info("  nyatictl --exec <hostname>");
+        logger.info("  nyatictl <hostname>");
+        logger.info("  nyatictl --exec all");
         return;
       }
-      const selected_server = argv.exec || hosts.find((h) => argv[h]);
-      if (argv.exec === "all") {
+      const selected_server =
+        config.argv.exec || hosts.find((h) => config.argv[h]);
+      if (config.argv.exec === "all" || config.argv.all) {
         for (let i = 0; i < hosts.length; i++) {
           clients.push(await add_client(hosts[i], config.hosts[hosts[i]]));
         }
@@ -51,20 +51,20 @@ export default function (config: Config, argv: Argv): ClientsManager {
           await add_client(selected_server, config.hosts[selected_server]),
         );
       } else if (selected_server) {
-        console.log(`❌ ERROR: server not found: ${selected_server}`);
+        logger.error(`Server not found: ${selected_server}`);
       }
-      console.log(`👓 Servers : ${clients.length} hosts`);
+      logger.info(`Connecting to ${clients.length} host(s)`);
       for (let i = 0; i < clients.length; i++) {
         const client = clients[i];
         const [res, err] = await client.connect();
         if (!res) {
-          console.log(
-            `❌ ERROR: connection failed ${client.name} - ${client.server.host}`,
+          logger.serverError(
+            client.name,
+            `${(err as { message?: string })?.message}`,
           );
-          console.log(`       ${(err as { message?: string })?.message}`);
           process.exit(1);
         } else {
-          console.log(`📡 Found : ${client.name}`);
+          logger.info(`Connected to ${client.name}:${client.server.host}`);
         }
       }
     },

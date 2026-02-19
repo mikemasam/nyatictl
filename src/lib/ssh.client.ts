@@ -1,7 +1,13 @@
 import { existsSync, readFileSync } from "fs";
 import { Client } from "ssh2";
 import getInput from "./get.input.js";
-import type { Server, Task, SshClient as SshClientType } from "../types.js";
+import { logger } from "./logger.js";
+import type {
+  Server,
+  Task,
+  SshClient as SshClientType,
+  Config,
+} from "../types.js";
 
 interface SshClientInput {
   name: string;
@@ -11,6 +17,7 @@ interface SshClientInput {
 }
 
 export default class Ssh implements SshClientType {
+  config: Config;
   name: string;
   server: Server;
   connected: boolean;
@@ -19,7 +26,9 @@ export default class Ssh implements SshClientType {
   client: Client | null = null;
   passphrase: string | undefined;
 
-  constructor(name: string, server: Server) {
+  constructor(config: Config, name: string, server: Server) {
+    this.config = config;
+    this.name = name;
     this.name = name;
     this.server = server;
     this.connected = false;
@@ -90,7 +99,7 @@ export default class Ssh implements SshClientType {
         resolve([true, null]);
       });
       this.client.on("error", (err) => {
-        console.log(err);
+        logger.debug(`SSH Error: ${err.message}`);
         this.connected = false;
         resolve([false, err]);
       });
@@ -113,25 +122,31 @@ export default class Ssh implements SshClientType {
   async exec(
     task: Task,
     _spinner: unknown,
-    output_log: boolean
+    config: Config,
   ): Promise<[number, string]> {
     return new Promise((resolve) => {
       let output = "";
+      if (config.argv.debug) logger.debug(`Command: ${task.cmd}`);
       const authRequired = task.askpass === 1;
       this.client?.exec(
         `${task.dir ? "cd " + task.dir + ";" : ""} ${task.cmd}`,
         { pty: true },
         (err, stream) => {
-          if (err) return resolve([-1, err?.message || ""]);
+          if (err) {
+            return resolve([-1, err?.message || ""]);
+          }
           stream.on("close", (code: number) => {
             resolve([code, output]);
           });
           stream.on("data", (data: Buffer) => {
-            if (output_log)
-              console.log(
-                `auth required = [${authRequired}] `,
-                data.toString()
-              );
+            if (config.argv.debug) {
+              const dataStr = data.toString();
+              if (authRequired && dataStr.toLowerCase().includes("password")) {
+                logger.debug("Password prompt detected");
+              } else {
+                logger.debug(dataStr);
+              }
+            }
             output += data.toString();
             if (
               authRequired &&
@@ -142,16 +157,16 @@ export default class Ssh implements SshClientType {
               this.getSUPassword().then(() => {
                 (_spinner as { stop: () => void; start: () => void })?.start();
                 output = "";
-                if (output_log) console.log(`Auth submitted`);
+                if (config.argv.debug) logger.debug("Password submitted");
                 stream.write(`${this.password}\n`);
               });
             }
           });
           stream.stderr.on("data", (data: Buffer) => {
-            if (output_log) console.log(data.toString());
+            if (config.argv.debug) logger.debug(data.toString());
             output += data.toString();
           });
-        }
+        },
       );
     });
   }

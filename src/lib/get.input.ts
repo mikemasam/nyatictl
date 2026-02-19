@@ -1,5 +1,6 @@
 import prompt from "prompt";
 import type { Server } from "../types.js";
+import { logger } from "./logger.js";
 
 prompt.message = "Nyatictl";
 
@@ -69,6 +70,6 @@ async function parseEnv(
   }
   const nvalue = client.env?.[_env_name as string];
   if (nvalue === undefined && !optional)
-    console.log(` ${_env_name} not defined`);
+    logger.warn(`Environment variable not defined: ${_env_name}`);
   return [nvalue, optional];
 }
