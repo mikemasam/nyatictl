@@ -1,9 +1,11 @@
 import parseLiteral from "./parse.literal.js";
-export default function taskparser(config, tasks) {
-  const commands = [];
+import type { Config, Task, Command } from "../types.js";
+
+export default function taskparser(config: Config, tasks: Task[]): Command[] {
+  const commands: Command[] = [];
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
-    const command = {
+    const command: Command = {
       name: task.name,
       cmd: task.cmd,
       expect: task.expect,
@@ -19,9 +21,9 @@ export default function taskparser(config, tasks) {
   return parseCommands(config, commands);
 }
 
-export function parseCommands(config, commands) {
+export function parseCommands(config: Config, commands: Command[]): Command[] {
   for (let i = 0; i < commands.length; i++) {
-    commands[i].cmd = parseLiteral(config, commands[i].cmd);
+    commands[i].cmd = parseLiteral(config, commands[i].cmd) || "";
     commands[i].dir = parseLiteral(config, commands[i].dir);
     commands[i].message = parseLiteral(config, commands[i].message);
   }

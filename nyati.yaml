@@ -1,0 +1,101 @@
+version: 11
+
+appname: myapp
+dir: '/var/www/html/${appname}/'
+params:
+  myparam: this is my parameter value
+  another_param: another value
+hosts:
+  local:
+    host: '#env?:TEST_HOST'
+    username: '#env?:TEST_USERNAME'
+    port: 22
+    _password: '#env?:TEST_PASSWORD'
+    privateKey: '#env:TEST_PRIVATE_KEY'
+    passphrase: '#env:PASSPHRASE_KEY'
+    envpath: .
+    envfile: .env
+    debug: false 
+    output: true
+
+  production:
+    host: prod.example.com
+    username: admin
+    port: 22
+    password: '#env:PROD_PASSWORD'
+    privateKey: '#env:PROD_KEY_PATH'
+    passphrase: '#env?:PROD_PASSPHRASE'
+    envpath: .
+    envfile: .prod.env
+    debug: false
+    output: false
+
+  staging:
+    host: staging.example.com
+    username: developer
+    privateKey: '/home/user/.ssh/staging_id_rsa'
+    passphrase: '#env?:STAGING_PASSPHRASE'
+    envfile: .staging.env
+
+tasks:
+  - name: basic_task
+    cmd: echo "Hello World"
+    expect: 0
+    message: Basic task succeeded
+    output: 1
+    dir: /home/user
+    retry: 1
+    askpass: 1
+    lib: 1
+    debug: true
+
+  - name: task_with_params
+    cmd: echo ${myparam}
+    expect: 0
+    message: Parameter substitution works
+
+  - name: task_with_dir
+    cmd: pwd
+    expect: 0
+    dir: /var/www
+
+  - name: task_expect_error
+    cmd: "false"
+    expect: 1
+    message: Task expected to fail with code 1
+
+  - name: task_retry_example
+    cmd: ls /nonexistent
+    expect: 0
+    retry: 1
+    message: Will prompt for retry on failure
+
+  - name: task_with_sudo
+    cmd: touch /root/test_file
+    expect: 0
+    askpass: 1
+    message: Prompts for sudo password
+
+  - name: lib_task
+    cmd: echo "Library task"
+    expect: 0
+    lib: 1
+    message: Only runs with --task flag
+
+  - name: output_example
+    cmd: cat /etc/hostname
+    expect: 0
+    output: 1
+    message: Shows stdout output
+
+  - name: task_chain
+    cmd: echo "Chain step 1"
+    expect: 0
+
+  - name: version_info
+    cmd: "echo App: ${appname}, Dir: ${dir}, Version: ${release_version}"
+    expect: 0
+    message: built-in variables available
+
+
+
